@@ -5,23 +5,16 @@ public class Estimate {
 	private String keyWord;
 	private int score;
 
-	public Estimate(String keyWord, int score) {
-		this.setKeyWord(keyWord);
-		this.score = score;
-	}
-
-	public int getScore() {
-		return score;
+	public Estimate(String newKeyWord, int newScore) {
+		keyWord = newKeyWord;
+		score =newScore;
 	}
 
 	public String getKeyWord() {
 		return keyWord;
 	}
 
-	public void setKeyWord(String keyWord) {
-		this.keyWord = keyWord;
+	public int getScore() {
+		return score;
 	}
-
-
-
 }
