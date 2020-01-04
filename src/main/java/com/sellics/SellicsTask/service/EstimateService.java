@@ -21,10 +21,10 @@ import com.sellics.SellicsTask.model.Estimate;
 
 @Service
 public class EstimateService {
-	
+
 	public Estimate getEstimate(String keyWord)
 			throws JsonIOException, JsonSyntaxException, IOException, InterruptedException {
-		
+
 		long startTime = System.currentTimeMillis();
 		int finalScore = 0;
 		int score = 0;
@@ -32,43 +32,47 @@ public class EstimateService {
 		for (int i = 0; i < keyWord.length(); i++) {
 
 			String keyWordSubString = keyWord.substring(0, i + 1);
-			JsonArray subStringJsonArray = getProductList(keyWordSubString, startTime);
-			Set<String> subStringList = convertToArrayList(subStringJsonArray);
-
-			score = getScore(subStringList, keyWord) + score;
+			
+			if (underTenSeconds(startTime)) {
+				
+				JsonArray subStringJsonArray = getProductList(keyWordSubString);
+				Set<String> subStringList = convertToArrayList(subStringJsonArray);
+				score = getSubStringScore(subStringList, keyWord) + score;
+			
+			} else {
+				System.out.println("microservice only has an SLA of 10 seconds for a request round-trip​.");
+				break;
+			}
 		}
 
-		finalScore = (100 / (keyWord.length() * 10)) * score;
+		finalScore = getFinalScore(keyWord, score);
 
 		return new Estimate(keyWord, finalScore);
 
 	}
 
-	private JsonArray getProductList(String keyword, Long startTime) throws MalformedURLException, IOException {
-		JsonArray jsonArray = null;
-		
-		if (timeOutCheck(startTime)) {
-			
-			String sURL = "https://completion.amazon.com/search/complete?search-alias=aps&client=amazon-search-ui&mkt=1&q="
-					+ keyword;
-
-			URL url = new URL(sURL);
-			URLConnection request = url.openConnection();
-			request.connect();
-			JsonParser jp = new JsonParser();
-
-			JsonElement jsonElement = jp.parse(new InputStreamReader((InputStream) request.getContent()));
-			jsonArray = jsonElement.getAsJsonArray();
-		}
-		return jsonArray;
-
+	private int getFinalScore(String keyWord, int score) {
+		return (100 / (keyWord.length() * 10)) * score;
 	}
 
-	private boolean timeOutCheck(Long startTime) {
+	private JsonArray getProductList(String keyword) throws MalformedURLException, IOException {
+		String sURL = "https://completion.amazon.com/search/complete?search-alias=aps&client=amazon-search-ui&mkt=1&q="
+				+ keyword;
+
+		URL url = new URL(sURL);
+		URLConnection request = url.openConnection();
+		request.connect();
+		JsonParser jp = new JsonParser();
+
+		JsonElement jsonElement = jp.parse(new InputStreamReader((InputStream) request.getContent()));
+		 return jsonElement.getAsJsonArray();
+	}
+
+	private boolean underTenSeconds(Long startTime) {
 		return (System.currentTimeMillis() < startTime + 10000);
 	}
 
-	private int getScore(Set<String> subStringList, String keyWord) {
+	private int getSubStringScore(Set<String> subStringList, String keyWord) {
 		int result = 0;
 		for (String s : subStringList) {
 			if (s.contains(keyWord)) {

@@ -7,7 +7,7 @@ public class Estimate {
 
 	public Estimate(String newKeyWord, int newScore) {
 		keyWord = newKeyWord;
-		score =newScore;
+		score = newScore;
 	}
 
 	public String getKeyWord() {
