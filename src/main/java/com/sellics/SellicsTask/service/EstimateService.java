@@ -7,11 +7,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -31,7 +29,7 @@ public class EstimateService {
 		long startTime = System.currentTimeMillis();
 		int finalScore = 0;
 		int score = 0;
-		
+
 		if (isKeyWordValidInput(keyWord)) {
 
 			for (int i = 0; i < keyWord.length(); i++) {
@@ -41,25 +39,28 @@ public class EstimateService {
 				if (underTenSeconds(startTime)) {
 
 					JsonArray subStringJsonArray = getProductList(keyWordSubString);
-					Set<String> subStringList = convertToArrayList(subStringJsonArray);
-					score = getSubStringScore(subStringList, keyWord) + score;
+					List<String> subStringProductList = getProductsFromJsonArray(subStringJsonArray);
+
+					score = getSubStringScore(subStringProductList, keyWord) + score;
 
 				} else {
 					throw new RuntimeException("microservice only has an SLA of 10 seconds for a request round-trip​.");
 				}
+
 			}
+
 		} else {
 			throw new RuntimeException("Invalid input, key word must start with Alpha numeric character");
 		}
 
 		finalScore = getFinalScore(keyWord, score);
-		
+
 		return new Estimate(keyWord, finalScore);
 
 	}
 
 	private boolean isKeyWordValidInput(String keyWord) {
-		String firstChar = keyWord.substring(0, 1); 
+		String firstChar = keyWord.substring(0, 1);
 		return (StringUtils.isAlphanumeric(firstChar));
 	}
 
@@ -84,7 +85,7 @@ public class EstimateService {
 		return (System.currentTimeMillis() < startTime + 10000);
 	}
 
-	private int getSubStringScore(Set<String> subStringList, String keyWord) {
+	private int getSubStringScore(List<String> subStringList, String keyWord) {
 		int result = 0;
 		for (String s : subStringList) {
 			if (s.contains(keyWord)) {
@@ -94,19 +95,16 @@ public class EstimateService {
 		return result;
 	}
 
-	private Set<String> convertToArrayList(JsonArray jsonArray) {
-		Set<String> subStringList = new HashSet<String>();
+	private List<String> getProductsFromJsonArray(JsonArray jsonArray) {
+		List<String> subStringPoductList=  new ArrayList<String>();
 		if (jsonArray != null) {
-			
-			TypeToken<ArrayList<String>> token = new TypeToken<ArrayList<String>>() {};
-			
-			ArrayList<String> productList = new Gson().fromJson(jsonArray.get(1), token.getType());
-			
-			for (int i = 0; i < productList.size(); i++) {
-				subStringList.add(productList.get(i));
-			}
+
+			TypeToken<ArrayList<String>> token = new TypeToken<ArrayList<String>>() {
+			};
+			subStringPoductList = new Gson().fromJson(jsonArray.get(1), token.getType());
+
 		}
-		return subStringList;
+		return subStringPoductList;
 	}
 
 }
