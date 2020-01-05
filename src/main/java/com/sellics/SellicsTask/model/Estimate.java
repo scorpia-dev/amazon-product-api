@@ -3,9 +3,9 @@ package com.sellics.SellicsTask.model;
 public class Estimate {
 
 	private String keyWord;
-	private int score;
+	private float score;
 
-	public Estimate(String newKeyWord, int newScore) {
+	public Estimate(String newKeyWord, float newScore) {
 		keyWord = newKeyWord;
 		score = newScore;
 	}
@@ -14,7 +14,7 @@ public class Estimate {
 		return keyWord;
 	}
 
-	public int getScore() {
+	public float getScore() {
 		return score;
 	}
 }

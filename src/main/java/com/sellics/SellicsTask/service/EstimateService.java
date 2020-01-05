@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -29,8 +30,9 @@ public class EstimateService {
 		if (isKeyWordValidInput(keyWord)) {
 
 			long startTime = System.currentTimeMillis();
-			int finalScore = 0;
+			float finalScore = 0;
 			int keyWordOccurance = 0;
+			int totalReturnedProducts = 0;
 
 			for (int i = 0; i < keyWord.length(); i++) {
 
@@ -41,6 +43,7 @@ public class EstimateService {
 					JsonArray subStringJsonArray = getProductList(keyWordSubString);
 					List<String> subStringProductList = convertJsonArrayToList(subStringJsonArray);
 
+					totalReturnedProducts = subStringProductList.size() + totalReturnedProducts;
 					keyWordOccurance = getKeyWordOccuranceInSubString(subStringProductList, keyWord) + keyWordOccurance;
 
 				} else {
@@ -48,9 +51,9 @@ public class EstimateService {
 				}
 			}
 
-			finalScore = getFinalScore(keyWord, keyWordOccurance);
+			finalScore = getFinalScore(totalReturnedProducts, keyWordOccurance);
 			return new Estimate(keyWord, finalScore);
-			
+
 		} else {
 			throw new RuntimeException("Invalid input, key word must start with Alpha numeric character");
 		}
@@ -61,13 +64,16 @@ public class EstimateService {
 		return (StringUtils.isAlphanumeric(firstChar));
 	}
 
-	private int getFinalScore(String keyWord, int keyWordOccurance) {
-		return (100 / (keyWord.length() * 10)) * keyWordOccurance;
+	private float getFinalScore(int totalReturnedProducts, int keyWordOccurance) {
+		float percent = (float) 100 / totalReturnedProducts;
+		return percent * keyWordOccurance;
 	}
 
 	private JsonArray getProductList(String keyword) throws MalformedURLException, IOException {
+		String encodedKeyWord = URLEncoder.encode(keyword, "UTF-8");
+
 		String sURL = "https://completion.amazon.com/search/complete?search-alias=aps&client=amazon-search-ui&mkt=1&q="
-				+ keyword;
+				+ encodedKeyWord;
 
 		URL url = new URL(sURL);
 		URLConnection request = url.openConnection();

@@ -17,12 +17,12 @@ public class EstimateController {
 
 	@Autowired
 	EstimateService estimateService;
-	
-	@RequestMapping(value="estimate", method = RequestMethod.GET)
-	public @ResponseBody 
-	Estimate setKeyWord(@RequestParam("keyword") String keyword) throws JsonIOException, JsonSyntaxException, IOException, InterruptedException{
-				
-		 return estimateService.getEstimate(keyword);
+
+	@RequestMapping(value = "estimate", method = RequestMethod.GET)
+	public @ResponseBody Estimate setKeyWord(@RequestParam("keyword") String keyword)
+			throws JsonIOException, JsonSyntaxException, IOException, InterruptedException {
+
+		return estimateService.getEstimate(keyword);
 	}
-	
+
 }
