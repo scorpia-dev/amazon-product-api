@@ -26,11 +26,11 @@ public class EstimateService {
 	public Estimate getEstimate(String keyWord)
 			throws JsonIOException, JsonSyntaxException, IOException, InterruptedException {
 
-		long startTime = System.currentTimeMillis();
-		int finalScore = 0;
-		int score = 0;
-
 		if (isKeyWordValidInput(keyWord)) {
+
+			long startTime = System.currentTimeMillis();
+			int finalScore = 0;
+			int keyWordOccurance = 0;
 
 			for (int i = 0; i < keyWord.length(); i++) {
 
@@ -39,24 +39,21 @@ public class EstimateService {
 				if (underTenSeconds(startTime)) {
 
 					JsonArray subStringJsonArray = getProductList(keyWordSubString);
-					List<String> subStringProductList = getProductsFromJsonArray(subStringJsonArray);
+					List<String> subStringProductList = convertJsonArrayToList(subStringJsonArray);
 
-					score = getSubStringScore(subStringProductList, keyWord) + score;
+					keyWordOccurance = getKeyWordOccuranceInSubString(subStringProductList, keyWord) + keyWordOccurance;
 
 				} else {
 					throw new RuntimeException("microservice only has an SLA of 10 seconds for a request round-trip​.");
 				}
-
 			}
 
+			finalScore = getFinalScore(keyWord, keyWordOccurance);
+			return new Estimate(keyWord, finalScore);
+			
 		} else {
 			throw new RuntimeException("Invalid input, key word must start with Alpha numeric character");
 		}
-
-		finalScore = getFinalScore(keyWord, score);
-
-		return new Estimate(keyWord, finalScore);
-
 	}
 
 	private boolean isKeyWordValidInput(String keyWord) {
@@ -64,8 +61,8 @@ public class EstimateService {
 		return (StringUtils.isAlphanumeric(firstChar));
 	}
 
-	private int getFinalScore(String keyWord, int score) {
-		return (100 / (keyWord.length() * 10)) * score;
+	private int getFinalScore(String keyWord, int keyWordOccurance) {
+		return (100 / (keyWord.length() * 10)) * keyWordOccurance;
 	}
 
 	private JsonArray getProductList(String keyword) throws MalformedURLException, IOException {
@@ -85,7 +82,7 @@ public class EstimateService {
 		return (System.currentTimeMillis() < startTime + 10000);
 	}
 
-	private int getSubStringScore(List<String> subStringList, String keyWord) {
+	private int getKeyWordOccuranceInSubString(List<String> subStringList, String keyWord) {
 		int result = 0;
 		for (String s : subStringList) {
 			if (s.contains(keyWord)) {
@@ -95,16 +92,16 @@ public class EstimateService {
 		return result;
 	}
 
-	private List<String> getProductsFromJsonArray(JsonArray jsonArray) {
-		List<String> subStringPoductList=  new ArrayList<String>();
+	private List<String> convertJsonArrayToList(JsonArray jsonArray) {
+		List<String> subStringProductList = new ArrayList<String>();
 		if (jsonArray != null) {
 
 			TypeToken<ArrayList<String>> token = new TypeToken<ArrayList<String>>() {
 			};
-			subStringPoductList = new Gson().fromJson(jsonArray.get(1), token.getType());
+			subStringProductList = new Gson().fromJson(jsonArray.get(1), token.getType());
 
 		}
-		return subStringPoductList;
+		return subStringProductList;
 	}
 
 }
