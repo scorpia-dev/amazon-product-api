@@ -14,7 +14,11 @@ http://localhost:8080/estimate?keyword=photo%20frame
 
 Will return
 
+```JSON
 {
 "keyWord": "photo frame",
 "score": 48.18182
 }
+```
+
+The score is a value 0-100, rating how popular of of search term your keyword is
