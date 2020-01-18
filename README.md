@@ -23,4 +23,4 @@ Will return
 }
 ```
 
-The score is a value 0-100, rating how popular of of search term your keyword is
+The score is a value 0-100, rating how popular your keyword is as a search term on Amazon
