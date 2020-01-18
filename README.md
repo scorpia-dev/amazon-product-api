@@ -1,4 +1,4 @@
-# amazon-product-api
+# Amazon-product-api
 
 This is an app to rank a products(keyWord) search term popularity(score) on Amazon.
 
