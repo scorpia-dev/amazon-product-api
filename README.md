@@ -1,4 +1,6 @@
-# amazon-produdct-api
+# amazon-product-api
+
+This is an app to rank a products(keyWord) search term popularity(score) on Amazon.
 
 Run as Spring Boot app
 
