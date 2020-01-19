@@ -1,6 +1,7 @@
 package com.sellics.SellicsTask;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -20,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.util.NestedServletException;
 
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
@@ -33,12 +35,13 @@ import com.sellics.SellicsTask.service.EstimateService;
 @ComponentScan("com.sellics.SellicsTask.service")
 public class EstimateControllerTest {
 
+
 	@Autowired
 	private MockMvc mvc;
-	
+
 	@Autowired
 	EstimateService estimateService;
-	
+
 	@Test
 	public void setKeyWordTest() throws Exception {
 		String keyWord = "keyboard";
@@ -51,9 +54,16 @@ public class EstimateControllerTest {
 				.andExpect(MockMvcResultMatchers.jsonPath("score").value(score));
 
 	}
-	
+
+	@Test
+	public void setInvalidKeyWordTest() throws Exception {
+		String keyWord = " invalid keyword";
+
+		NestedServletException thrown = assertThrows(NestedServletException.class, () -> mvc.perform(get("/estimate").param("keyword", keyWord)));
+
+		assertTrue(thrown.getMessage().contains("Invalid input, key word must start with Alpha numeric character"));
+				
+
 	}
 
-
-	
-
+}
