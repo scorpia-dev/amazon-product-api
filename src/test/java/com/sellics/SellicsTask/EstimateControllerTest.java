@@ -59,10 +59,10 @@ public class EstimateControllerTest {
 	public void setInvalidKeyWordTest() throws Exception {
 		String keyWord = " invalid keyword";
 
-		NestedServletException thrown = assertThrows(NestedServletException.class, () -> mvc.perform(get("/estimate").param("keyword", keyWord)));
+		NestedServletException thrown = assertThrows(NestedServletException.class,
+				() -> mvc.perform(get("/estimate").param("keyword", keyWord)));
 
 		assertTrue(thrown.getMessage().contains("Invalid input, key word must start with Alpha numeric character"));
-				
 
 	}
 
