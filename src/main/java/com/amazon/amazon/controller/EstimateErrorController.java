@@ -1,4 +1,4 @@
-package com.sellics.SellicsTask.controller;
+package com.amazon.amazon.controller;
 
 import javax.servlet.http.HttpServletRequest;
 

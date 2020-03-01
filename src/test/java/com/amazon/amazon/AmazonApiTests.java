@@ -1,10 +1,10 @@
-package com.sellics.SellicsTask;
+package com.amazon.amazon;
 
 import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SellicsTaskApplicationTests {
+class AmazonApiTests {
 
 	@Test
 	void contextLoads() {

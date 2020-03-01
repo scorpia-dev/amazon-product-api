@@ -1,4 +1,4 @@
-package com.sellics.SellicsTask.model;
+package com.amazon.amazon.model;
 
 public class Estimate {
 

@@ -1,4 +1,4 @@
-package com.sellics.SellicsTask;
+package com.amazon.amazon;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -15,12 +15,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-import com.sellics.SellicsTask.model.Estimate;
-import com.sellics.SellicsTask.service.EstimateService;
+import com.amazon.amazon.model.Estimate;
+import com.amazon.amazon.service.EstimateService;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
-@ComponentScan("com.sellics.SellicsTask.service")
+@ComponentScan("com.amazon.amazon.service")
 public class EstimateServiceTest {
 
 	@Autowired
@@ -37,15 +37,15 @@ public class EstimateServiceTest {
 	}
 
 	@Test
-	public void getEstimateInvalidKeyWordTest() throws JsonIOException, JsonSyntaxException, IOException, InterruptedException {
+	public void getEstimateInvalidKeyWordTest()
+			throws JsonIOException, JsonSyntaxException, IOException, InterruptedException {
 
 		String keyWord = " not valid first char in front of word";
-		
-		RuntimeException thrown = assertThrows(RuntimeException.class,
-				() -> estimateService.getEstimate(keyWord));
+
+		RuntimeException thrown = assertThrows(RuntimeException.class, () -> estimateService.getEstimate(keyWord));
 
 		assertTrue(thrown.getMessage().contains("Invalid input, key word must start with Alpha numeric character"));
-		
+
 	}
 	
 	@Test

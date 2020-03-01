@@ -1,4 +1,4 @@
-package com.sellics.SellicsTask.controller;
+package com.amazon.amazon.controller;
 
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-import com.sellics.SellicsTask.model.Estimate;
-import com.sellics.SellicsTask.service.EstimateService;
+import com.amazon.amazon.model.Estimate;
+import com.amazon.amazon.service.EstimateService;
 
 @Controller
 public class EstimateController {
@@ -20,7 +20,7 @@ public class EstimateController {
 
 	@RequestMapping(value = "estimate", method = RequestMethod.GET)
 	public @ResponseBody Estimate setKeyWord(@RequestParam("keyword") String keyword)
-			throws JsonIOException, JsonSyntaxException, IOException, InterruptedException {
+			throws JsonIOException, JsonSyntaxException, IOException {
 
 		return estimateService.getEstimate(keyword);
 	}

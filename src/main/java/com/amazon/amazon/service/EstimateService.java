@@ -1,4 +1,4 @@
-package com.sellics.SellicsTask.service;
+package com.amazon.amazon.service;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,13 +19,12 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
-import com.sellics.SellicsTask.model.Estimate;
+import com.amazon.amazon.model.Estimate;
 
 @Service
 public class EstimateService {
 
-	public Estimate getEstimate(String keyWord)
-			throws JsonIOException, JsonSyntaxException, IOException, InterruptedException {
+	public Estimate getEstimate(String keyWord) throws JsonIOException, JsonSyntaxException, IOException {
 
 		if (isKeyWordValidInput(keyWord)) {
 
