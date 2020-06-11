@@ -20,7 +20,7 @@ public class EstimateController {
 
 	@RequestMapping(value = "estimate", method = RequestMethod.GET)
 	public @ResponseBody Estimate setKeyWord(@RequestParam("keyword") String keyword)
-			throws JsonIOException, JsonSyntaxException, IOException {
+			throws Exception {
 
 		return estimateService.getEstimate(keyword);
 	}

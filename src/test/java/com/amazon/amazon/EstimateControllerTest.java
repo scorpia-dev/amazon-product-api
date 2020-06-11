@@ -22,10 +22,11 @@ import org.springframework.web.util.NestedServletException;
 import com.amazon.amazon.model.Estimate;
 import com.amazon.amazon.service.EstimateService;
 
+import java.util.Objects;
+
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
-
 @ComponentScan("com.amazon.amazon.service")
 public class EstimateControllerTest {
 
@@ -54,7 +55,7 @@ public class EstimateControllerTest {
 		NestedServletException thrown = assertThrows(NestedServletException.class,
 				() -> mvc.perform(get("/estimate").param("keyword", keyWord)));
 
-		assertTrue(thrown.getMessage().contains("Invalid input, key word must start with Alpha numeric character"));
+		assertTrue(Objects.requireNonNull(thrown.getMessage()).contains("Invalid input, key word must start with Alpha numeric character"));
 
 	}
 

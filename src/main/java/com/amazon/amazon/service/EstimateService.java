@@ -1,64 +1,74 @@
 package com.amazon.amazon.service;
 
-import java.io.IOException;
+import com.amazon.amazon.model.Estimate;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.springframework.stereotype.Service;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
-import com.amazon.amazon.model.Estimate;
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class EstimateService {
 
-	public Estimate getEstimate(String keyWord) throws JsonIOException, JsonSyntaxException, IOException {
+	public Estimate getEstimate(String keyWord) {
 
 		if (isKeyWordValidInput(keyWord)) {
 
-			long startTime = System.currentTimeMillis();
-			float finalScore = 0;
-			int keyWordOccurance = 0;
-			int totalReturnedProducts = 0;
+		//	long startTime = System.currentTimeMillis();
 
+
+			List<String> keyWordList = new ArrayList<>();
 			for (int i = 0; i < keyWord.length(); i++) {
-
-				String keyWordSubString = keyWord.substring(0, i + 1);
-
-				if (underTenSeconds(startTime)) {
-
-					JsonArray subStringJsonArray = getProductList(keyWordSubString);
-					List<String> subStringProductList = convertJsonArrayToList(subStringJsonArray);
-
-					totalReturnedProducts = subStringProductList.size() + totalReturnedProducts;
-					keyWordOccurance = getKeyWordOccuranceInSubString(subStringProductList, keyWord) + keyWordOccurance;
-
-				} else {
-					throw new RuntimeException("microservice only has an SLA of 10 seconds for a request round-trip​.");
-				}
+				keyWordList.add(keyWord.substring(0, i + 1));
 			}
 
-			finalScore = getFinalScore(totalReturnedProducts, keyWordOccurance);
-			return new Estimate(keyWord, finalScore);
+			//	if (underTenSeconds(startTime)) {
+
+			List<String> subStringProductList =
+					keyWordList.stream()
+					.map(word -> CompletableFuture.supplyAsync(
+							() -> this.getProductList(word)))
+					.map(future -> future.thenApply(this::convertJsonArrayToList))
+
+							.collect(toList())
+					.stream()
+							.map(CompletableFuture::join)
+							.flatMap(List::stream)
+							.collect(Collectors.toList());
+
+					int totalReturnedProducts = subStringProductList.size();
+					int keyWordOccurance = getKeyWordOccuranceInSubString(subStringProductList, keyWord);
+
+//				} else
+//					throw new RuntimeException("microservice only has an SLA of 10 seconds for a request round-trip​.");
+//			//}
+
+			return new Estimate(keyWord, getFinalScore(totalReturnedProducts, keyWordOccurance));
 
 		} else {
 			throw new RuntimeException("Invalid input, key word must start with Alpha numeric character");
 		}
 	}
 
-	private boolean isKeyWordValidInput(String keyWord) {
+		private boolean isKeyWordValidInput(String keyWord) {
 		String firstChar = keyWord.substring(0, 1);
 		return (StringUtils.isAlphanumeric(firstChar));
 	}
@@ -68,19 +78,25 @@ public class EstimateService {
 		return percent * keyWordOccurance;
 	}
 
-	private JsonArray getProductList(String keyword) throws MalformedURLException, IOException {
-		String encodedKeyWord = URLEncoder.encode(keyword, "UTF-8");
+	private JsonArray getProductList(String keyword) {
+		try {
 
-		String sURL = "https://completion.amazon.com/search/complete?search-alias=aps&client=amazon-search-ui&mkt=1&q="
-				+ encodedKeyWord;
+			String encodedKeyWord = URLEncoder.encode(keyword, "UTF-8");
 
-		URL url = new URL(sURL);
-		URLConnection request = url.openConnection();
-		request.connect();
-		JsonParser jp = new JsonParser();
+			String sURL = "https://completion.amazon.com/search/complete?search-alias=aps&client=amazon-search-ui&mkt=1&q="
+					+ encodedKeyWord;
 
-		JsonElement jsonElement = jp.parse(new InputStreamReader((InputStream) request.getContent()));
-		return jsonElement.getAsJsonArray();
+			URL url = new URL(sURL);
+			URLConnection request = url.openConnection();
+			request.connect();
+			JsonParser jp = new JsonParser();
+
+			JsonElement jsonElement = jp.parse(new InputStreamReader((InputStream) request.getContent()));
+			return jsonElement.getAsJsonArray();
+		}
+	 catch (Exception e) {
+		 throw new RuntimeException(e.toString());
+	 }
 	}
 
 	private boolean underTenSeconds(Long startTime) {

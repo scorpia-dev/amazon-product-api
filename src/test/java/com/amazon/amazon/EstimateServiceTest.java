@@ -1,6 +1,7 @@
 package com.amazon.amazon;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -31,9 +32,8 @@ public class EstimateServiceTest {
 
 		String keyWord = "house";
 		Estimate estimate = estimateService.getEstimate(keyWord);
-		assertThat(estimate).isNotNull();
-		assertThat(estimate.getKeyWord().equals("house"));
-		assertThat(estimate.getScore() >= 0 && estimate.getScore() <= 100);
+		assertEquals("house", estimate.getKeyWord());
+		assertTrue(estimate.getScore() >= 0 && estimate.getScore() <= 100);
 	}
 
 	@Test

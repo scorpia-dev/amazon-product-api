@@ -1,5 +1,6 @@
 package com.amazon.amazon.model;
 
+
 public class Estimate {
 
 	private String keyWord;
