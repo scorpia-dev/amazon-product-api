@@ -15,15 +15,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toList;
 
 @Service
 public class EstimateService {
@@ -32,47 +26,37 @@ public class EstimateService {
 
 		if (isKeyWordValidInput(keyWord)) {
 
-		//	long startTime = System.currentTimeMillis();
-
-
 			List<String> keyWordList = new ArrayList<>();
 			for (int i = 0; i < keyWord.length(); i++) {
 				keyWordList.add(keyWord.substring(0, i + 1));
 			}
 
-			//	if (underTenSeconds(startTime)) {
-
-			List<String> subStringProductList =
+			List<String> allReturnProducts =
 					keyWordList.stream()
-					.map(word -> CompletableFuture.supplyAsync(
-							() -> this.getProductList(word)))
+							.map(word -> CompletableFuture.supplyAsync(
+									() -> this.getProductList(word)))
 							.map(CompletableFuture::join)
-					.map(this::convertJsonArrayToList)
+							.map(this::convertJsonArrayToList)
 							.flatMap(List::stream)
 							.collect(Collectors.toList());
 
-					int totalReturnedProducts = subStringProductList.size();
-					int keyWordOccurance = getKeyWordOccuranceInSubString(subStringProductList, keyWord);
+			long keyWordOccurrence = getKeyWordOccurrenceInSubString(allReturnProducts, keyWord);
 
-//				} else
-//					throw new RuntimeException("microservice only has an SLA of 10 seconds for a request round-trip​.");
-//			//}
-
-			return new Estimate(keyWord, getFinalScore(totalReturnedProducts, keyWordOccurance));
+			return new Estimate(keyWord, getFinalScore(allReturnProducts.size(), keyWordOccurrence));
 
 		} else {
-			throw new RuntimeException("Invalid input, key word must start with Alpha numeric character");
+			throw new IllegalArgumentException("Invalid input, key word must start with Alpha numeric character");
 		}
 	}
 
-		private boolean isKeyWordValidInput(String keyWord) {
+	private boolean isKeyWordValidInput(String keyWord) {
 		String firstChar = keyWord.substring(0, 1);
 		return (StringUtils.isAlphanumeric(firstChar));
 	}
 
-	private float getFinalScore(int totalReturnedProducts, int keyWordOccurance) {
+	private float getFinalScore(int totalReturnedProducts, long keyWordOccurrence) {
 		float percent = (float) 100 / totalReturnedProducts;
-		return percent * keyWordOccurance;
+		return percent * keyWordOccurrence;
 	}
 
 	private JsonArray getProductList(String keyword) {
@@ -85,39 +69,27 @@ public class EstimateService {
 
 			URL url = new URL(sURL);
 			URLConnection request = url.openConnection();
+			request.setConnectTimeout(10000);
+			request.setReadTimeout(10000);
 			request.connect();
-			JsonParser jp = new JsonParser();
 
-			JsonElement jsonElement = jp.parse(new InputStreamReader((InputStream) request.getContent()));
+			JsonElement jsonElement = new JsonParser().parse(new InputStreamReader((InputStream) request.getContent()));
 			return jsonElement.getAsJsonArray();
+		} catch (Exception e) {
+			throw new RuntimeException(e.toString());
 		}
-	 catch (Exception e) {
-		 throw new RuntimeException(e.toString());
-	 }
 	}
 
-	private boolean underTenSeconds(Long startTime) {
-		return (System.currentTimeMillis() < startTime + 10000);
-	}
-
-	private int getKeyWordOccuranceInSubString(List<String> subStringList, String keyWord) {
-		int result = 0;
-		for (String s : subStringList) {
-			if (s.contains(keyWord)) {
-				result++;
-			}
-		}
-		return result;
+	private long getKeyWordOccurrenceInSubString(List<String> subStringList, String keyWord) {
+		return subStringList.stream().filter(s -> s.contains(keyWord)).count();
 	}
 
 	private List<String> convertJsonArrayToList(JsonArray jsonArray) {
-		List<String> subStringProductList = new ArrayList<String>();
+		List<String> subStringProductList = new ArrayList<>();
 		if (jsonArray != null) {
-
 			TypeToken<ArrayList<String>> token = new TypeToken<ArrayList<String>>() {
 			};
 			subStringProductList = new Gson().fromJson(jsonArray.get(1), token.getType());
-
 		}
 		return subStringProductList;
 	}

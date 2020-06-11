@@ -1,5 +1,6 @@
 package com.amazon.amazon;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -45,18 +46,17 @@ public class EstimateControllerTest {
 				.andExpect(status().isOk()).andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.jsonPath("keyWord").value("keyboard"))
 				.andExpect(MockMvcResultMatchers.jsonPath("score").value(score));
-
 	}
 
 	@Test
 	public void setInvalidKeyWordTest() throws Exception {
 		String keyWord = " invalid keyword";
 
-		NestedServletException thrown = assertThrows(NestedServletException.class,
-				() -> mvc.perform(get("/estimate").param("keyword", keyWord)));
-
-		assertTrue(Objects.requireNonNull(thrown.getMessage()).contains("Invalid input, key word must start with Alpha numeric character"));
-
+		mvc.perform(get("/estimate").param("keyword", keyWord).accept(MediaType.APPLICATION_JSON)).andDo(print())
+				.andExpect(status().isBadRequest()).andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+				.andExpect(status().is(400))
+				.andDo(print()).andExpect(content().string(containsString(
+				"some parameters are invalid: Invalid input, key word must start with Alpha numeric character")));
 	}
 
 }

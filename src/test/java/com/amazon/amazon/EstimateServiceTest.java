@@ -53,7 +53,7 @@ public class EstimateServiceTest {
 
 		String keyWord = "iphoneiphoneiphoneiphoneiphoneiphoneiphoneiphoneiphoneiphoneiphoneiphoneiphoneiphoneiphoneiphoneiphone";
 		
-		RuntimeException thrown = assertThrows(RuntimeException.class,
+		RuntimeException thrown = assertThrows(IllegalArgumentException.class,
 				() -> estimateService.getEstimate(keyWord));
 
 		assertTrue(thrown.getMessage().contains("microservice only has an SLA of 10 seconds for a request round-trip​."));
