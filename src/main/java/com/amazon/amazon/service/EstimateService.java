@@ -46,11 +46,8 @@ public class EstimateService {
 					keyWordList.stream()
 					.map(word -> CompletableFuture.supplyAsync(
 							() -> this.getProductList(word)))
-					.map(future -> future.thenApply(this::convertJsonArrayToList))
-
-							.collect(toList())
-					.stream()
 							.map(CompletableFuture::join)
+					.map(this::convertJsonArrayToList)
 							.flatMap(List::stream)
 							.collect(Collectors.toList());
 
