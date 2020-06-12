@@ -37,6 +37,7 @@ The score is a value 0-100, rating how popular your keyword is as a search term 
 * JDK9 or higher
 * Build with Maven
 * Lombok has been used to reduce boilerplate code
+* Google's Gson library has been used to process the JSON from the API
 
 ### Running
 Run as a Spring Boot App
