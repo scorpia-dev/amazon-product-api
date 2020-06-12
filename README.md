@@ -14,16 +14,16 @@ So with this app, a very popular product like an Iphone will have a high score, 
 
 How it works 
 ------
- * **Get product score for a photo frame**
+ * **Get product score for a product**
 
 ```
-GET - http://localhost:8080/estimate/{keyword} i.e.http://localhost:8080/estimate/photo frame
+GET - http://localhost:8080/estimate/{product} i.e.http://localhost:8080/estimate/photo frame
 ```
 Will return
 
 ```JSON
 {
-"keyWord": "photo frame",
+"product": "photo frame",
 "score": 48.18182
 }
 ```
