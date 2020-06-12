@@ -15,14 +15,14 @@ public class EstimateController {
     @Autowired
     EstimateService estimateService;
 
-    @GetMapping("/estimate/{keyWord}")
-    public Estimate getEstimate(@PathVariable String keyWord) {
+    @GetMapping("/estimate/{product}")
+    public Estimate getEstimate(@PathVariable String product) {
 
-        if (!StringUtils.isAlphanumeric(keyWord.substring(0, 1))) {
+        if (!StringUtils.isAlphanumeric(product.substring(0, 1))) {
             throw new IllegalArgumentException("Invalid input, key word must start with Alpha numeric character");
         }
 
-        return estimateService.getEstimate(keyWord);
+        return estimateService.getEstimate(product);
     }
 
 }

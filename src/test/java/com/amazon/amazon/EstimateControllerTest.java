@@ -36,7 +36,7 @@ public class EstimateControllerTest {
 		String keyWord = "keyboard";
 		Estimate estimate = estimateService.getEstimate(keyWord);
 		float score = estimate.getScore();
-		mvc.perform(get("/estimate/{keyWord}",keyWord).contentType(MediaType.APPLICATION_JSON))
+		mvc.perform(get("/estimate/{product}",keyWord).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andDo(print())
 				.andExpect(MockMvcResultMatchers.jsonPath("keyWord").value("keyboard"))
@@ -47,7 +47,7 @@ public class EstimateControllerTest {
 	public void setInvalidKeyWordTest() throws Exception {
 		String keyWord = " invalid keyword";
 
-		mvc.perform(get("/estimate/{keyWord}",keyWord).accept(MediaType.APPLICATION_JSON)).andDo(print())
+		mvc.perform(get("/estimate/{product}",keyWord).accept(MediaType.APPLICATION_JSON)).andDo(print())
 				.andExpect(status().isBadRequest()).andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(status().is(400))
 				.andDo(print()).andExpect(content().string(containsString(

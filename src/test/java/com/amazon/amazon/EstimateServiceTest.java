@@ -29,7 +29,7 @@ public class EstimateServiceTest {
 
 		String keyWord = "house";
 		Estimate estimate = estimateService.getEstimate(keyWord);
-		assertEquals("house", estimate.getKeyWord());
+		assertEquals("house", estimate.getProduct());
 		assertTrue(estimate.getScore() > 0 && estimate.getScore() < 100);
 	}
 

@@ -22,15 +22,15 @@ import java.util.stream.Collectors;
 @Service
 public class EstimateService {
 
-	public Estimate getEstimate(String keyWord) {
+	public Estimate getEstimate(String product) {
 
-			List<String> keyWordList = new ArrayList<>();
-			for (int i = 0; i < keyWord.length(); i++) {
-				keyWordList.add(keyWord.substring(0, i + 1));
+			List<String> productList = new ArrayList<>();
+			for (int i = 0; i < product.length(); i++) {
+				productList.add(product.substring(0, i + 1));
 			}
 
 			List<String> allReturnProducts =
-					keyWordList.stream()
+					productList.stream()
 							.map(word -> CompletableFuture.supplyAsync(
 									() -> this.getProductList(word)))
 							.map(CompletableFuture::join)
@@ -38,15 +38,15 @@ public class EstimateService {
 							.flatMap(List::stream)
 							.collect(Collectors.toList());
 
-			long keyWordOccurrence = getKeyWordOccurrenceInSubString(allReturnProducts, keyWord);
+			long productOccurrence = getKeyWordOccurrenceInSubString(allReturnProducts, product);
 
-			return new Estimate(keyWord, getFinalScore(allReturnProducts.size(), keyWordOccurrence));
+			return new Estimate(product, getFinalScore(allReturnProducts.size(), productOccurrence));
 
 	}
 
-	private float getFinalScore(int totalReturnedProducts, long keyWordOccurrence) {
+	private float getFinalScore(int totalReturnedProducts, long productOccurrence) {
 		float percent = (float) 100 / totalReturnedProducts;
-		return percent * keyWordOccurrence;
+		return percent * productOccurrence;
 	}
 
 	private JsonArray getProductList(String keyword) {
