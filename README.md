@@ -14,7 +14,7 @@ So with this app, a very popular product like an Iphone will have a high score, 
 
 How it works 
 ------
- * **Get product score for a product**
+ * **Get product score for your desired product**
 
 ```
 GET - http://localhost:8080/estimate/{product} i.e.http://localhost:8080/estimate/photo frame
