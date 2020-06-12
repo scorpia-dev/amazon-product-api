@@ -2,7 +2,7 @@
 
 This is a RESTful Web Service App Using Java 9 and Spring Boot. 
 
-It is used to rank a product and its search term popularity(score) on Amazon. 
+It is used to return search term popularity(score) of a product(User of app's input) on Amazon. 
 
 This is done by using Amazon's open product serch API, which will return a list of products related to the search term used. You can see this in action on Amazons main page.. if you type in a letter, you get a auto suggestion of 10 searchterms/products that are most asscoiated with that character. 
 
