@@ -1,21 +1,16 @@
 package com.amazon.amazon.model;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor
 public class Estimate {
 
-	private String keyWord;
-	private float score;
+	@Getter
+	private final String keyWord;
 
-	public Estimate(String newKeyWord, float newScore) {
-		keyWord = newKeyWord;
-		score = newScore;
-	}
+	@Getter
+	private final float score;
 
-	public String getKeyWord() {
-		return keyWord;
-	}
-
-	public float getScore() {
-		return score;
-	}
 }

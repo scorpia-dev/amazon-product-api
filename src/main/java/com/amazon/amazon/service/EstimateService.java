@@ -6,9 +6,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -23,8 +23,6 @@ import java.util.stream.Collectors;
 public class EstimateService {
 
 	public Estimate getEstimate(String keyWord) {
-
-		if (isKeyWordValidInput(keyWord)) {
 
 			List<String> keyWordList = new ArrayList<>();
 			for (int i = 0; i < keyWord.length(); i++) {
@@ -44,14 +42,6 @@ public class EstimateService {
 
 			return new Estimate(keyWord, getFinalScore(allReturnProducts.size(), keyWordOccurrence));
 
-		} else {
-			throw new IllegalArgumentException("Invalid input, key word must start with Alpha numeric character");
-		}
-	}
-
-	private boolean isKeyWordValidInput(String keyWord) {
-		String firstChar = keyWord.substring(0, 1);
-		return (StringUtils.isAlphanumeric(firstChar));
 	}
 
 	private float getFinalScore(int totalReturnedProducts, long keyWordOccurrence) {
@@ -75,7 +65,7 @@ public class EstimateService {
 
 			JsonElement jsonElement = new JsonParser().parse(new InputStreamReader((InputStream) request.getContent()));
 			return jsonElement.getAsJsonArray();
-		} catch (Exception e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e.toString());
 		}
 	}
@@ -93,5 +83,4 @@ public class EstimateService {
 		}
 		return subStringProductList;
 	}
-
 }

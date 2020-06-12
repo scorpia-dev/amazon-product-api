@@ -1,28 +1,28 @@
 package com.amazon.amazon.controller;
 
-import java.io.IOException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
 import com.amazon.amazon.model.Estimate;
 import com.amazon.amazon.service.EstimateService;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+
+@RestController
 public class EstimateController {
 
-	@Autowired
-	EstimateService estimateService;
+    @Autowired
+    EstimateService estimateService;
 
-	@RequestMapping(value = "estimate", method = RequestMethod.GET)
-	public @ResponseBody Estimate setKeyWord(@RequestParam("keyword") String keyword)
-			throws Exception {
+    @GetMapping("/estimate/{keyWord}")
+    public Estimate getEstimate(@PathVariable String keyWord) {
 
-		return estimateService.getEstimate(keyword);
-	}
+        if (!StringUtils.isAlphanumeric(keyWord.substring(0, 1))) {
+            throw new IllegalArgumentException("Invalid input, key word must start with Alpha numeric character");
+        }
+
+        return estimateService.getEstimate(keyWord);
+    }
 
 }

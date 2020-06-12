@@ -1,13 +1,7 @@
 package com.amazon.amazon;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import com.amazon.amazon.model.Estimate;
+import com.amazon.amazon.service.EstimateService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +12,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.web.util.NestedServletException;
 
-import com.amazon.amazon.model.Estimate;
-import com.amazon.amazon.service.EstimateService;
-
-import java.util.Objects;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
@@ -42,8 +36,9 @@ public class EstimateControllerTest {
 		String keyWord = "keyboard";
 		Estimate estimate = estimateService.getEstimate(keyWord);
 		float score = estimate.getScore();
-		mvc.perform(get("/estimate").param("keyword", keyWord).accept(MediaType.APPLICATION_JSON)).andDo(print())
-				.andExpect(status().isOk()).andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+		mvc.perform(get("/estimate/{keyWord}",keyWord).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andDo(print())
 				.andExpect(MockMvcResultMatchers.jsonPath("keyWord").value("keyboard"))
 				.andExpect(MockMvcResultMatchers.jsonPath("score").value(score));
 	}
@@ -52,7 +47,7 @@ public class EstimateControllerTest {
 	public void setInvalidKeyWordTest() throws Exception {
 		String keyWord = " invalid keyword";
 
-		mvc.perform(get("/estimate").param("keyword", keyWord).accept(MediaType.APPLICATION_JSON)).andDo(print())
+		mvc.perform(get("/estimate/{keyWord}",keyWord).accept(MediaType.APPLICATION_JSON)).andDo(print())
 				.andExpect(status().isBadRequest()).andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(status().is(400))
 				.andDo(print()).andExpect(content().string(containsString(
