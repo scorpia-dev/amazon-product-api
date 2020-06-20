@@ -17,12 +17,9 @@ public class EstimateController {
 
     @GetMapping("/estimate/{product}")
     public Estimate getEstimate(@PathVariable String product) {
-
         if (!StringUtils.isAlphanumeric(product.substring(0, 1))) {
             throw new IllegalArgumentException("Invalid input, key word must start with Alpha numeric character");
         }
-
         return estimateService.getEstimate(product);
     }
-
 }

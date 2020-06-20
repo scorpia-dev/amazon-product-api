@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class EstimateService {
@@ -17,14 +16,8 @@ public class EstimateService {
     ProductServiceImpl productServiceImpl;
 
     public Estimate getEstimate(String product) {
-
-        List<String> productList = new ArrayList<>();
-        for (int i = 0; i < product.length(); i++) {
-            productList.add(product.substring(0, i + 1));
-        }
-
-        List<String> allReturnProducts =
-                productList.stream()
+        List<String> allProductsReturned =
+                getSubstringProductList(product).stream()
                         .map(word -> CompletableFuture.supplyAsync(
                                 () -> productServiceImpl.getProductList(word)))
                         .map(CompletableFuture::join)
@@ -32,10 +25,17 @@ public class EstimateService {
                         .flatMap(List::stream)
                         .collect(Collectors.toList());
 
-        long productOccurrence = getKeyWordOccurrenceInSubString(allReturnProducts, product);
+        long searchedProductOccurrence = getKeyWordOccurrenceInSubString(allProductsReturned, product);
 
-        return new Estimate(product, getFinalScore(allReturnProducts.size(), productOccurrence));
+        return new Estimate(product, getFinalScore(allProductsReturned.size(), searchedProductOccurrence));
+    }
 
+    private List<String> getSubstringProductList(String product) {
+        List<String> productList = new ArrayList<>();
+        for (int i = 0; i < product.length(); i++) {
+            productList.add(product.substring(0, i + 1));
+        }
+        return productList;
     }
 
     private float getFinalScore(int totalReturnedProducts, long productOccurrence) {
