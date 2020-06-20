@@ -21,16 +21,16 @@ import static org.junit.Assert.assertTrue;
 @ComponentScan("com.amazon.amazon.service")
 public class EstimateServiceTest {
 
-	@Autowired
-	EstimateService estimateService;
+    @Autowired
+    EstimateService estimateService;
 
-	@Test
-	public void getEstimateTest() throws JsonIOException, JsonSyntaxException, IOException, InterruptedException {
+    @Test
+    public void getEstimateTest() throws JsonIOException, JsonSyntaxException {
 
-		String keyWord = "house";
-		Estimate estimate = estimateService.getEstimate(keyWord);
-		assertEquals("house", estimate.getProduct());
-		assertTrue(estimate.getScore() > 0 && estimate.getScore() < 100);
-	}
+        String keyWord = "house";
+        Estimate estimate = estimateService.getEstimate(keyWord);
+        assertEquals("house", estimate.getProduct());
+        assertTrue(estimate.getScore() > 0 && estimate.getScore() < 100);
+    }
 
 }

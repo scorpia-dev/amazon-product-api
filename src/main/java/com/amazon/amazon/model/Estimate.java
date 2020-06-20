@@ -7,10 +7,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public class Estimate {
 
-	@Getter
-	private final String product;
+    @Getter
+    private final String product;
 
-	@Getter
-	private final float score;
+    @Getter
+    private final float score;
 
 }

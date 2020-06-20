@@ -25,33 +25,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ComponentScan("com.amazon.amazon.service")
 public class EstimateControllerTest {
 
-	@Autowired
-	private MockMvc mvc;
+    @Autowired
+    EstimateService estimateService;
+    @Autowired
+    private MockMvc mvc;
 
-	@Autowired
-	EstimateService estimateService;
+    @Test
+    public void setKeyWordTest() throws Exception {
+        String keyWord = "keyboard";
+        Estimate estimate = estimateService.getEstimate(keyWord);
+        float score = estimate.getScore();
+        mvc.perform(get("/estimate/{product}", keyWord).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(MockMvcResultMatchers.jsonPath("product").value("keyboard"))
+                .andExpect(MockMvcResultMatchers.jsonPath("score").value(score));
+    }
 
-	@Test
-	public void setKeyWordTest() throws Exception {
-		String keyWord = "keyboard";
-		Estimate estimate = estimateService.getEstimate(keyWord);
-		float score = estimate.getScore();
-		mvc.perform(get("/estimate/{product}",keyWord).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andDo(print())
-				.andExpect(MockMvcResultMatchers.jsonPath("keyWord").value("keyboard"))
-				.andExpect(MockMvcResultMatchers.jsonPath("score").value(score));
-	}
+    @Test
+    public void setInvalidKeyWordTest() throws Exception {
+        String keyWord = " invalid keyword";
 
-	@Test
-	public void setInvalidKeyWordTest() throws Exception {
-		String keyWord = " invalid keyword";
-
-		mvc.perform(get("/estimate/{product}",keyWord).accept(MediaType.APPLICATION_JSON)).andDo(print())
-				.andExpect(status().isBadRequest()).andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-				.andExpect(status().is(400))
-				.andDo(print()).andExpect(content().string(containsString(
-				"some parameters are invalid: Invalid input, key word must start with Alpha numeric character")));
-	}
+        mvc.perform(get("/estimate/{product}", keyWord).accept(MediaType.APPLICATION_JSON)).andDo(print())
+                .andExpect(status().isBadRequest()).andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(400))
+                .andDo(print()).andExpect(content().string(containsString(
+                "some parameters are invalid: Invalid input, key word must start with Alpha numeric character")));
+    }
 
 }
