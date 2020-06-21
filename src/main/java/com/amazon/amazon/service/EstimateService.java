@@ -25,9 +25,7 @@ public class EstimateService {
                         .flatMap(List::stream)
                         .collect(Collectors.toList());
 
-        long searchedProductOccurrence = getKeyWordOccurrenceInSubString(allProductsReturned, product);
-
-        return new Estimate(product, getFinalScore(allProductsReturned.size(), searchedProductOccurrence));
+        return new Estimate(product, getFinalScore(allProductsReturned.size(), getSearchedProductOccurrence(allProductsReturned, product)));
     }
 
     private List<String> getSubstringProductList(String product) {
@@ -43,7 +41,7 @@ public class EstimateService {
         return percent * productOccurrence;
     }
 
-    private long getKeyWordOccurrenceInSubString(List<String> subStringList, String keyWord) {
+    private long getSearchedProductOccurrence(List<String> subStringList, String keyWord) {
         return subStringList.stream().filter(s -> s.contains(keyWord)).count();
     }
 

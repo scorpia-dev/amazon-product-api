@@ -1,16 +1,13 @@
 package com.amazon.amazon.model;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Value;
 
-@AllArgsConstructor
+@Value
 public class Estimate {
 
-    @Getter
-    private final String product;
+    String product;
 
-    @Getter
-    private final float score;
+    float score;
 
 }
